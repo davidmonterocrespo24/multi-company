@@ -9,7 +9,7 @@
     "version": "15.0.1.0.0",
     "category": "Purchase Management",
     "website": "https://github.com/OCA/multi-company",
-    "author": "Odoo SA, Akretion, Tecnativa, Odoo Community Association (OCA),OdooNext",
+    "author": "Odoo SA, Akretion, Tecnativa, Odoo Community Association (OCA), OdooNext",
     "license": "AGPL-3",
     "installable": True,
     "depends": ["sale", "purchase", "stock", "account_invoice_inter_company"],
