@@ -320,7 +320,8 @@ class AccountMoveLine(models.Model):
         )
         with dest_form.invoice_line_ids.new() as line_form:
             # HACK: Related fields manually set due to Form() limitations
-            line_form.company_id = dest_move.company_id
+            #line_form.company_id = dest_move.company_id
+            #line_form.move_id.journal_id.company_id=dest_move.company_id
             # Regular fields
             line_form.display_type = self.display_type
             line_form.product_id = product
