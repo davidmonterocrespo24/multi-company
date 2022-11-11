@@ -17,10 +17,9 @@ class SaleOrder(models.Model):
     )
 
     def action_confirm(self):
-        for order in self.filtered("auto_purchase_order_id"):
-            for line in order.order_line.sudo():
-                if line.auto_purchase_line_id:
-                    line.auto_purchase_line_id.price_unit = line.price_unit
+
+        #virtual_available = order.product_id.with_context(warehouse=warehouse.id, to_date=order.date_planned_start).virtual_available
+
         return super(SaleOrder, self).action_confirm()
 
 
