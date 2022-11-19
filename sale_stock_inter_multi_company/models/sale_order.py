@@ -24,14 +24,13 @@ class SaleOrder(models.Model):
         data_virtual_available_multicompany = {}
         # Obtener en data_virtual_available_multicompany la relacion de compañia y productos con sus cantidades disponible
         for line in self.order_line:
-            virtual_available_in_stock = line.product_id.with_context(
-                {'warehouse': self.warehouse_id.id}).virtual_available
+            virtual_available_in_stock = line.product_id.virtual_available
             remaining_quantity = line.product_uom_qty - virtual_available_in_stock
             if virtual_available_in_stock > line.product_uom_qty:
                 continue
             for warehouse in self.env['stock.warehouse'].sudo().search([('company_id', '!=', self.company_id.id)]):
                 virtual_available_product = line.product_id.with_context(
-                    {'warehouse': warehouse.id}).virtual_available
+                    {'warehouse': warehouse.id,'sale_multicompany':True}).virtual_available
                 if virtual_available_product > 0 and remaining_quantity > 0:
                     available = 0
                     if remaining_quantity > virtual_available_product:
@@ -56,7 +55,7 @@ class SaleOrder(models.Model):
 
         po_obj = self.env["purchase.order"]
         for data in data_virtual_available_multicompany.keys():
-            purchase_id=po_obj.create({"partner_id": data.partner_id})
+            purchase_id=po_obj.create({"partner_id": data.partner_id.id})
             lines = []
             for product in data_virtual_available_multicompany[data]:
                 lines.append((0, 0,

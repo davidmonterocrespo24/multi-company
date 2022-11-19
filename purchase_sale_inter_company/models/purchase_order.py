@@ -3,12 +3,14 @@
 # Copyright 2018-2019 Tecnativa - Carlos Dauden
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo import _, models
+from odoo import _, models,fields
 from odoo.exceptions import UserError
 
 
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
+
+    muti_company_sale_order= fields.Many2one(comodel_name="sale.order", string="Venta multiempresa", required=False, )
 
     def button_approve(self, force=False):
         """Generate inter company sale order base on conditions."""
@@ -21,6 +23,12 @@ class PurchaseOrder(models.Model):
                 purchase_order.with_company(
                     dest_company.id
                 )._inter_company_create_sale_order(dest_company)
+                if purchase_order.picking_ids:
+                    for picking in purchase_order.picking_ids:
+                        picking.action_assign()
+                        picking.action_set_quantities_to_reservation()
+                        picking.action_confirm()
+                        picking.button_validate()
         return res
 
     def _get_user_domain(self, dest_company):
@@ -60,9 +68,7 @@ class PurchaseOrder(models.Model):
         """
         self.ensure_one()
         # Check intercompany user
-        intercompany_user = dest_company.intercompany_sale_user_id
-        if not intercompany_user:
-            intercompany_user = self.env.user
+        intercompany_user = self.env.user
         # check intercompany product
         self._check_intercompany_product(dest_company)
         # Accessing to selling partner with selling user, so data like
@@ -100,8 +106,15 @@ class PurchaseOrder(models.Model):
         if not self.partner_ref:
             self.partner_ref = sale_order.name
         # Validation of sale order
+        self.muti_company_sale_order=sale_order
         if dest_company.sale_auto_validation:
             sale_order.with_user(intercompany_user.id).sudo().action_confirm()
+            if sale_order.picking_ids:
+                for picking in sale_order.picking_ids:
+                    picking.action_assign()
+                    picking.action_set_quantities_to_reservation()
+                    picking.action_confirm()
+                    picking.button_validate()
 
     def _prepare_sale_order_data(
         self, name, partner, dest_company, direct_delivery_address
