@@ -24,7 +24,8 @@ class SaleOrder(models.Model):
         data_virtual_available_multicompany = {}
         # Obtener en data_virtual_available_multicompany la relacion de compañia y productos con sus cantidades disponible
         for line in self.order_line:
-            virtual_available_in_stock = line.product_id.virtual_available
+            virtual_available_in_stock = line.product_id.with_context(
+                {'warehouse': self.warehouse_id.id}).virtual_available
             remaining_quantity = line.product_uom_qty - virtual_available_in_stock
             if virtual_available_in_stock > line.product_uom_qty:
                 continue
