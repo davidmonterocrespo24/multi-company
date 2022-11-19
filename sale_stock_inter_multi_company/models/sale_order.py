@@ -31,7 +31,7 @@ class SaleOrder(models.Model):
                 continue
             for warehouse in self.env['stock.warehouse'].sudo().search([('company_id', '!=', self.company_id.id)]):
                 virtual_available_product = line.product_id.with_context(
-                    {'warehouse': warehouse.id,'sale_multicompany':True}).virtual_available
+                    {'warehouse': warehouse.id, 'sale_multicompany': True}).virtual_available
                 if virtual_available_product > 0 and remaining_quantity > 0:
                     available = 0
                     if remaining_quantity > virtual_available_product:
@@ -44,19 +44,19 @@ class SaleOrder(models.Model):
 
                         data_virtual_available_multicompany.update({
                             warehouse.company_id: {
-                                line.product_id: {'cantidad':available,'order_line':line}
+                                line.product_id: {'cantidad': available, 'order_line': line}
                             }
                         })
                     elif line.product_id not in data_virtual_available_multicompany[warehouse.company_id]:
                         data_virtual_available_multicompany[warehouse.company_id][
-                            line.product_id] =  {'cantidad':available,'order_line':line}
+                            line.product_id] = {'cantidad': available, 'order_line': line}
                     else:
                         data_virtual_available_multicompany[warehouse.company_id][
                             line.product_id]['cantidad'] += available
 
         po_obj = self.env["purchase.order"]
         for data in data_virtual_available_multicompany.keys():
-            purchase_id=po_obj.create({"partner_id": data.partner_id.id})
+            purchase_id = po_obj.create({"partner_id": data.partner_id.id})
             lines = []
             for product in data_virtual_available_multicompany[data]:
                 lines.append((0, 0,
@@ -64,8 +64,9 @@ class SaleOrder(models.Model):
                                   "name": product.display_name,
                                   "product_qty": data_virtual_available_multicompany[data][product]['cantidad'],
                                   "product_id": product.id,
-                                  "product_uom": data_virtual_available_multicompany[data][product]['order_line'].product_uom.id,
-                                  "sale_line_id":data_virtual_available_multicompany[data][product]['order_line'].id
+                                  "product_uom": data_virtual_available_multicompany[data][product][
+                                      'order_line'].product_uom.id,
+                                  "sale_line_id": data_virtual_available_multicompany[data][product]['order_line'].id
                               },))
             purchase_id.order_line = lines
 
