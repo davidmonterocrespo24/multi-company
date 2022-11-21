@@ -21,52 +21,52 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     def action_confirm(self):
-        data_virtual_available_multicompany = {}
-        # Obtener en data_virtual_available_multicompany la relacion de compañia y productos con sus cantidades disponible
+        data_free_qty_multicompany = {}
+        # Obtener en data_free_qty_multicompany la relacion de compañia y productos con sus cantidades disponible
         for line in self.order_line:
-            virtual_available_in_stock = line.product_id.with_context(
-                {'warehouse': self.warehouse_id.id}).virtual_available
-            remaining_quantity = line.product_uom_qty - virtual_available_in_stock
-            if virtual_available_in_stock > line.product_uom_qty:
+            free_qty_in_stock = line.product_id.with_context(
+                {'warehouse': self.warehouse_id.id}).free_qty
+            remaining_quantity = line.product_uom_qty - free_qty_in_stock
+            if free_qty_in_stock > line.product_uom_qty:
                 continue
             for warehouse in self.env['stock.warehouse'].sudo().search([('company_id', '!=', self.company_id.id)]):
-                virtual_available_product = line.product_id.with_context(
-                    {'warehouse': warehouse.id, 'sale_multicompany': True}).virtual_available
-                if virtual_available_product > 0 and remaining_quantity > 0:
+                free_qty_product = line.product_id.with_context(
+                    {'warehouse': warehouse.id, 'sale_multicompany': True}).free_qty
+                if free_qty_product > 0 and remaining_quantity > 0:
                     available = 0
-                    if remaining_quantity > virtual_available_product:
-                        available = virtual_available_product
-                        remaining_quantity = remaining_quantity - virtual_available_product
+                    if remaining_quantity > free_qty_product:
+                        available = free_qty_product
+                        remaining_quantity = remaining_quantity - free_qty_product
                     else:
                         available = remaining_quantity
                         remaining_quantity = 0
-                    if warehouse.company_id not in data_virtual_available_multicompany:
+                    if warehouse.company_id not in data_free_qty_multicompany:
 
-                        data_virtual_available_multicompany.update({
+                        data_free_qty_multicompany.update({
                             warehouse.company_id: {
                                 line.product_id: {'cantidad': available, 'order_line': line}
                             }
                         })
-                    elif line.product_id not in data_virtual_available_multicompany[warehouse.company_id]:
-                        data_virtual_available_multicompany[warehouse.company_id][
+                    elif line.product_id not in data_free_qty_multicompany[warehouse.company_id]:
+                        data_free_qty_multicompany[warehouse.company_id][
                             line.product_id] = {'cantidad': available, 'order_line': line}
                     else:
-                        data_virtual_available_multicompany[warehouse.company_id][
+                        data_free_qty_multicompany[warehouse.company_id][
                             line.product_id]['cantidad'] += available
 
         po_obj = self.env["purchase.order"]
-        for data in data_virtual_available_multicompany.keys():
+        for data in data_free_qty_multicompany.keys():
             purchase_id = po_obj.create({"partner_id": data.partner_id.id})
             lines = []
-            for product in data_virtual_available_multicompany[data]:
+            for product in data_free_qty_multicompany[data]:
                 lines.append((0, 0,
                               {
                                   "name": product.display_name,
-                                  "product_qty": data_virtual_available_multicompany[data][product]['cantidad'],
+                                  "product_qty": data_free_qty_multicompany[data][product]['cantidad'],
                                   "product_id": product.id,
-                                  "product_uom": data_virtual_available_multicompany[data][product][
+                                  "product_uom": data_free_qty_multicompany[data][product][
                                       'order_line'].product_uom.id,
-                                  "sale_line_id": data_virtual_available_multicompany[data][product]['order_line'].id
+                                  "sale_line_id": data_free_qty_multicompany[data][product]['order_line'].id
                               },))
             purchase_id.order_line = lines
 
