@@ -11,7 +11,7 @@
     "license": "LGPL-3",
     "installable": True,
     "application": False,
-    "depends": ["purchase_sale_inter_company"],
+    "depends": ["purchase_sale_inter_company","stock_free_quantity"],
     "development_status": "Production/Stable",
     "maintainers": ["pedrobaeza"],
 
