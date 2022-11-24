@@ -22,13 +22,15 @@ class ResCompany(models.Model):
         help="When a Sale Order is created by a multi company rule for "
              "this company, it will automatically validate it.",
     )
+
+
     warehouse_id = fields.Many2one(
         "stock.warehouse",
         string="Warehouse For Sale Orders",
         help="Default value to set on Sale Orders that "
              "will be created based on Purchase Orders made to this company",
-        default="_default_warehouse_id",
     )
+
     intercompany_sale_user_id = fields.Many2one(
         comodel_name="res.users",
         string="Intercompany Sale User",
@@ -38,6 +40,3 @@ class ResCompany(models.Model):
 
     supplierinfo_pricelist_id = fields.Many2one(comodel_name="product.supplierinfo",
                                                 string='Precio de Lista de Proveedores', required=False, )
-
-    def _default_warehouse_id(self):
-        return self.env['stock.warehouse'].search([('company_id', '=', self.company.id)], limit=1).id
