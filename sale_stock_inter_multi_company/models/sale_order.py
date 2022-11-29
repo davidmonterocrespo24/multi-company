@@ -69,6 +69,7 @@ class SaleOrder(models.Model):
                                   "sale_line_id": data_free_qty_multicompany[data][product]['order_line'].id
                               },))
             purchase_id.order_line = lines
+            purchase_id.button_approve()
 
         return super().action_confirm()
 
