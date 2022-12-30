@@ -164,3 +164,9 @@ class ProductProduct(models.Model):
             domain + dest_loc_domain + ['!'] + loc_domain if loc_domain else domain + dest_loc_domain,
             domain + loc_domain + ['!'] + dest_loc_domain if dest_loc_domain else domain + loc_domain
         )
+
+
+    # se sobre escribe este metodo para no vovlerle hacer una compra a una compañia interna por el MTO
+    def _prepare_sellers(self, params=False):
+        company_ids=self.env['res.company'].search([]).mapped('partner_id')
+        return self.seller_ids.filtered(lambda s: s.name.active and s.name.id not in company_ids.ids).sorted(lambda s: (s.sequence, -s.min_qty, s.price, s.id))
