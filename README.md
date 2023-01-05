@@ -7,7 +7,7 @@
 
 <!-- /!\ do not modify above this line -->
 
-# multi-company
+# multi-company2
 
 TODO: add repo description.
 
