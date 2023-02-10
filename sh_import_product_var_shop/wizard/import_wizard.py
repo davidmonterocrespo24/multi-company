@@ -329,6 +329,8 @@ class ImportProductVarWizard(models.TransientModel):
                                 skip_header = False
 
                                 for i in range(27, len(row)):
+                                    if i== 28:
+                                        continue
                                     name_field = row[i]
                                     name_m2o = False
                                     if '@' in row[i]:
