@@ -737,7 +737,7 @@ class ImportProductVarWizard(models.TransientModel):
                                         tmpl_vals.update(
                                             {'invoice_policy': 'delivery'})
 
-                                    if row[13] not in (None, ""):
+                                    if row[28] not in (None, ""):
                                         tmpl_vals.update(
                                             {'list_price': row[28]})
 
