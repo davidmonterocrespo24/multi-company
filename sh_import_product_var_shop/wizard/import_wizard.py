@@ -38,9 +38,9 @@ class ImportProductVarWizard(models.TransientModel):
         ('barcode', 'Barcode'),
         ('int_ref', 'Internal Reference'),
     ],
-                                         default='name',
-                                         string="Product Variant Update By",
-                                         required=True)
+        default='name',
+        string="Product Variant Update By",
+        required=True)
 
     is_create_m2m_record = fields.Boolean(
         string="Create a New Record for Dynamic M2M Field (if not exist)?")
@@ -67,9 +67,9 @@ class ImportProductVarWizard(models.TransientModel):
                     if previous_categ:
                         categ_id = self.env['product.category'].sudo().create({
                             'name':
-                            x,
+                                x,
                             'parent_id':
-                            previous_categ
+                                previous_categ
                         })
                     else:
                         categ_id = self.env['product.category'].sudo().create(
@@ -211,11 +211,11 @@ class ImportProductVarWizard(models.TransientModel):
 
             return {
                 "error":
-                " - " + field_name + " given value " + str(field_value) +
-                " does not match for selection. "
+                    " - " + field_name + " given value " + str(field_value) +
+                    " does not match for selection. "
             }
 
-        #finaly return false
+        # finaly return false
         if field_value in (None, ""):
             return {field_name: False}
 
@@ -226,7 +226,7 @@ class ImportProductVarWizard(models.TransientModel):
     # ====================================================================================
 
     def show_success_msg(self, counter, skipped_line_no):
-        #open the new success message box
+        # open the new success message box
         view = self.env.ref('sh_message.sh_message_wizard')
         context = dict(self._context or {})
         dic_msg = str(counter) + " Records imported successfully"
@@ -267,22 +267,22 @@ class ImportProductVarWizard(models.TransientModel):
                     values.append(
                         dt.strftime(DEFAULT_SERVER_DATETIME_FORMAT
                                     ) if is_datetime else dt.
-                        strftime(DEFAULT_SERVER_DATE_FORMAT))
+                            strftime(DEFAULT_SERVER_DATE_FORMAT))
                 elif cell.ctype is xlrd.XL_CELL_BOOLEAN:
                     values.append(u'True' if cell.value else u'False')
                 elif cell.ctype is xlrd.XL_CELL_ERROR:
                     raise ValueError(
                         _("Invalid cell value at row %(row)s, column %(col)s: %(cell_value)s"
                           ) % {
-                              'row':
-                              rowx,
-                              'col':
-                              colx,
-                              'cell_value':
-                              xlrd.error_text_from_code.get(
-                                  cell.value,
-                                  _("unknown error code %s") % cell.value)
-                          })
+                            'row':
+                                rowx,
+                            'col':
+                                colx,
+                            'cell_value':
+                                xlrd.error_text_from_code.get(
+                                    cell.value,
+                                    _("unknown error code %s") % cell.value)
+                        })
                 else:
                     values.append(cell.value)
             values_sheet.append(values)
@@ -293,10 +293,10 @@ class ImportProductVarWizard(models.TransientModel):
         product_tmpl_obj = self.env['product.template']
         ir_model_fields_obj = self.env['ir.model.fields']
 
-        #perform import lead
+        # perform import lead
         if self and self.file:
 
-            #For CSV
+            # For CSV
             if self.import_type == 'csv' or self.import_type == 'excel':
                 counter = 1
                 skipped_line_no = {}
@@ -329,7 +329,7 @@ class ImportProductVarWizard(models.TransientModel):
                                 skip_header = False
 
                                 for i in range(27, len(row)):
-                                    if i== 28:
+                                    if i == 28:
                                         continue
                                     name_field = row[i]
                                     name_m2o = False
@@ -367,7 +367,7 @@ class ImportProductVarWizard(models.TransientModel):
                                         row_field_dic.update({i: field_dic})
                                     else:
                                         row_field_error_dic.update(
-                                            {row[i]: " - field not found"})
+                                            {row[i]: " - field not found"+" "+str(i)})
 
                                 counter = counter + 1
                                 continue
@@ -392,7 +392,7 @@ class ImportProductVarWizard(models.TransientModel):
                                               "") and row[1] not in (None, ""):
                                 var_vals = {}
 
-                                #Product Template Start
+                                # Product Template Start
                                 if row[0] != running_tmpl:
                                     running_tmpl = row[0]
 
@@ -421,15 +421,15 @@ class ImportProductVarWizard(models.TransientModel):
                                     # Search or Update product by
                                     # =====================================
 
-                                    #TODO: NEED TO CLEAN LAST PRODUCT ALSO.
+                                    # TODO: NEED TO CLEAN LAST PRODUCT ALSO.
                                     if created_product_tmpl and self.method == 'write':
 
                                         # Remove Unnecessary Attribute Line.
                                         # ===============================================
                                         attrs = created_product_tmpl.attribute_line_ids.mapped(
                                             'attribute_id').filtered(
-                                                lambda r: r.id not in
-                                                list_to_keep_attr)
+                                            lambda r: r.id not in
+                                                      list_to_keep_attr)
                                         for attr in attrs:
                                             line = created_product_tmpl.attribute_line_ids.search(
                                                 [
@@ -449,8 +449,8 @@ class ImportProductVarWizard(models.TransientModel):
                                         # ===============================================
                                         attr_values = created_product_tmpl.attribute_line_ids.mapped(
                                             'value_ids').filtered(
-                                                lambda r: r.id not in
-                                                list_to_keep_attr_value)
+                                            lambda r: r.id not in
+                                                      list_to_keep_attr_value)
                                         for attr_value in attr_values:
                                             line = created_product_tmpl.attribute_line_ids.search(
                                                 [
@@ -463,7 +463,7 @@ class ImportProductVarWizard(models.TransientModel):
                                             if line:
                                                 line.write({
                                                     'value_ids':
-                                                    [(3, attr_value.id, 0)],
+                                                        [(3, attr_value.id, 0)],
                                                 })
 
                                         # Remove Unnecessary Attribute Value From Line.
@@ -496,13 +496,13 @@ class ImportProductVarWizard(models.TransientModel):
                                     if row[5].strip() in (None, ""):
                                         search_category = self.env[
                                             'product.category'].search([
-                                                ('complete_name', '=', 'All')
-                                            ],
-                                                                       limit=1)
+                                            ('complete_name', '=', 'All')
+                                        ],
+                                            limit=1)
                                         if search_category:
                                             tmpl_vals.update({
                                                 'categ_id':
-                                                search_category.id
+                                                    search_category.id
                                             })
                                         else:
                                             skipped_line_no[str(
@@ -513,9 +513,9 @@ class ImportProductVarWizard(models.TransientModel):
                                     else:
                                         search_category = self.env[
                                             'product.category'].search(
-                                                [('complete_name', '=',
-                                                  row[5].strip())],
-                                                limit=1)
+                                            [('complete_name', '=',
+                                              row[5].strip())],
+                                            limit=1)
 
                                         # -----------------------------------------
                                         # if category not found then create new
@@ -527,9 +527,9 @@ class ImportProductVarWizard(models.TransientModel):
 
                                                 search_category = self.env[
                                                     'product.category'].search(
-                                                        [('complete_name', '=',
-                                                          row[5].strip())],
-                                                        limit=1)
+                                                    [('complete_name', '=',
+                                                      row[5].strip())],
+                                                    limit=1)
 
                                         # -----------------------------------------
                                         # if category not found then create new
@@ -537,7 +537,7 @@ class ImportProductVarWizard(models.TransientModel):
                                         if search_category:
                                             tmpl_vals.update({
                                                 'categ_id':
-                                                search_category.id
+                                                    search_category.id
                                             })
                                         else:
                                             skipped_line_no[str(
@@ -547,32 +547,32 @@ class ImportProductVarWizard(models.TransientModel):
                                             counter = counter + 1
                                             continue
 
-#                                     if row[5].strip() in (None, ""):
-#                                         search_category = self.env['product.category'].search(
-#                                             [('complete_name', '=', 'All')], limit=1)
-#                                         if search_category:
-#                                             tmpl_vals.update(
-#                                                 {'categ_id': search_category.id})
-#                                         else:
-#                                             skipped_line_no[str(
-#                                                 counter)] = " - Category -  not found. "
-#                                             counter = counter + 1
-#                                             continue
-#                                     else:
-#                                         search_category = self.env['product.category'].search(
-#                                             [('complete_name', '=', row[5].strip())], limit=1)
-#                                         if search_category:
-#                                             tmpl_vals.update(
-#                                                 {'categ_id': search_category.id})
-#                                         else:
-#                                             skipped_line_no[str(
-#                                                 counter)] = " - Category not found. "
-#                                             counter = counter + 1
-#                                             continue
+                                    #                                     if row[5].strip() in (None, ""):
+                                    #                                         search_category = self.env['product.category'].search(
+                                    #                                             [('complete_name', '=', 'All')], limit=1)
+                                    #                                         if search_category:
+                                    #                                             tmpl_vals.update(
+                                    #                                                 {'categ_id': search_category.id})
+                                    #                                         else:
+                                    #                                             skipped_line_no[str(
+                                    #                                                 counter)] = " - Category -  not found. "
+                                    #                                             counter = counter + 1
+                                    #                                             continue
+                                    #                                     else:
+                                    #                                         search_category = self.env['product.category'].search(
+                                    #                                             [('complete_name', '=', row[5].strip())], limit=1)
+                                    #                                         if search_category:
+                                    #                                             tmpl_vals.update(
+                                    #                                                 {'categ_id': search_category.id})
+                                    #                                         else:
+                                    #                                             skipped_line_no[str(
+                                    #                                                 counter)] = " - Category not found. "
+                                    #                                             counter = counter + 1
+                                    #                                             continue
 
-# ================================
-# Ecommerce Categories
-# ================================
+                                    # ================================
+                                    # Ecommerce Categories
+                                    # ================================
 
                                     public_categ_ids_list = []
                                     some_public_categ_not_found = False
@@ -582,8 +582,8 @@ class ImportProductVarWizard(models.TransientModel):
                                             if x != '':
                                                 search_public_categ = self.env[
                                                     'product.public.category'].search(
-                                                        [('name', '=', x)],
-                                                        limit=1)
+                                                    [('name', '=', x)],
+                                                    limit=1)
                                                 if search_public_categ:
                                                     public_categ_ids_list.append(
                                                         search_public_categ.id)
@@ -600,7 +600,7 @@ class ImportProductVarWizard(models.TransientModel):
                                     else:
                                         tmpl_vals.update({
                                             'public_categ_ids':
-                                            [(6, 0, public_categ_ids_list)]
+                                                [(6, 0, public_categ_ids_list)]
                                         })
 
                                     # ================================
@@ -610,8 +610,8 @@ class ImportProductVarWizard(models.TransientModel):
                                     if row[7].strip() in (None, ""):
                                         search_uom = self.env[
                                             'uom.uom'].search(
-                                                [('name', '=', 'Units')],
-                                                limit=1)
+                                            [('name', '=', 'Units')],
+                                            limit=1)
                                         if search_uom:
                                             tmpl_vals.update(
                                                 {'uom_id': search_uom.id})
@@ -624,9 +624,9 @@ class ImportProductVarWizard(models.TransientModel):
                                     else:
                                         search_uom = self.env[
                                             'uom.uom'].search([
-                                                ('name', '=', row[7].strip())
-                                            ],
-                                                              limit=1)
+                                            ('name', '=', row[7].strip())
+                                        ],
+                                            limit=1)
                                         if search_uom:
                                             tmpl_vals.update(
                                                 {'uom_id': search_uom.id})
@@ -640,12 +640,12 @@ class ImportProductVarWizard(models.TransientModel):
                                     if row[8].strip() in (None, ""):
                                         search_uom_po = self.env[
                                             'uom.uom'].search(
-                                                [('name', '=', 'Units')],
-                                                limit=1)
+                                            [('name', '=', 'Units')],
+                                            limit=1)
                                         if search_uom_po:
                                             tmpl_vals.update({
                                                 'uom_po_id':
-                                                search_uom_po.id
+                                                    search_uom_po.id
                                             })
                                         else:
                                             skipped_line_no[str(
@@ -656,13 +656,13 @@ class ImportProductVarWizard(models.TransientModel):
                                     else:
                                         search_uom_po = self.env[
                                             'uom.uom'].search([
-                                                ('name', '=', row[8].strip())
-                                            ],
-                                                              limit=1)
+                                            ('name', '=', row[8].strip())
+                                        ],
+                                            limit=1)
                                         if search_uom_po:
                                             tmpl_vals.update({
                                                 'uom_po_id':
-                                                search_uom_po.id
+                                                    search_uom_po.id
                                             })
                                         else:
                                             skipped_line_no[str(
@@ -679,8 +679,8 @@ class ImportProductVarWizard(models.TransientModel):
                                             if x != '':
                                                 search_customer_tax = self.env[
                                                     'account.tax'].search(
-                                                        [('name', '=', x)],
-                                                        limit=1)
+                                                    [('name', '=', x)],
+                                                    limit=1)
                                                 if search_customer_tax:
                                                     customer_taxes_ids_list.append(
                                                         search_customer_tax.id)
@@ -697,7 +697,7 @@ class ImportProductVarWizard(models.TransientModel):
                                     else:
                                         tmpl_vals.update({
                                             'taxes_id':
-                                            [(6, 0, customer_taxes_ids_list)]
+                                                [(6, 0, customer_taxes_ids_list)]
                                         })
 
                                     vendor_taxes_ids_list = []
@@ -708,8 +708,8 @@ class ImportProductVarWizard(models.TransientModel):
                                             if x != '':
                                                 search_vendor_tax = self.env[
                                                     'account.tax'].search(
-                                                        [('name', '=', x)],
-                                                        limit=1)
+                                                    [('name', '=', x)],
+                                                    limit=1)
                                                 if search_vendor_tax:
                                                     vendor_taxes_ids_list.append(
                                                         search_vendor_tax.id)
@@ -726,7 +726,7 @@ class ImportProductVarWizard(models.TransientModel):
                                     else:
                                         tmpl_vals.update({
                                             'supplier_taxes_id':
-                                            [(6, 0, vendor_taxes_ids_list)]
+                                                [(6, 0, vendor_taxes_ids_list)]
                                         })
 
                                     tmpl_vals.update(
@@ -786,8 +786,8 @@ class ImportProductVarWizard(models.TransientModel):
                                             else:
                                                 try:
                                                     with open(
-                                                            image_path,
-                                                            'rb') as image:
+                                                        image_path,
+                                                        'rb') as image:
                                                         image.seek(0)
                                                         binary_data = image.read(
                                                         )
@@ -823,7 +823,7 @@ class ImportProductVarWizard(models.TransientModel):
 
                                         tmpl_vals.update({
                                             "product_template_image_ids":
-                                            multi_img_vals_list
+                                                multi_img_vals_list
                                         })
 
                                     # ================================================================
@@ -847,9 +847,9 @@ class ImportProductVarWizard(models.TransientModel):
                                     # =====================================================
 
                                     if row[17].strip() in (
-                                            None,
-                                            "") or row[18].strip() in (None,
-                                                                       ""):
+                                        None,
+                                        "") or row[18].strip() in (None,
+                                                                   ""):
 
                                         has_variant = False
                                         if row[19] not in (None, ""):
@@ -879,7 +879,7 @@ class ImportProductVarWizard(models.TransientModel):
                                                             r.content)
                                                         tmpl_vals.update({
                                                             'image_1920':
-                                                            image_base64
+                                                                image_base64
                                                         })
                                                     else:
                                                         skipped_line_no[str(
@@ -898,8 +898,8 @@ class ImportProductVarWizard(models.TransientModel):
                                             else:
                                                 try:
                                                     with open(
-                                                            image_path,
-                                                            'rb') as image:
+                                                        image_path,
+                                                        'rb') as image:
                                                         image.seek(0)
                                                         binary_data = image.read(
                                                         )
@@ -909,7 +909,7 @@ class ImportProductVarWizard(models.TransientModel):
                                                         if image_base64:
                                                             tmpl_vals.update({
                                                                 'image_1920':
-                                                                image_base64
+                                                                    image_base64
                                                             })
                                                         else:
                                                             skipped_line_no[str(
@@ -959,24 +959,24 @@ class ImportProductVarWizard(models.TransientModel):
                                                 tmpl_vals)
 
                                     # =================================================================
-#                                     if created_product_tmpl and self.method == 'write':
-#                                         created_product_tmpl.attribute_line_ids = False
+                                    #                                     if created_product_tmpl and self.method == 'write':
+                                    #                                         created_product_tmpl.attribute_line_ids = False
 
                                     if has_variant == False and row[
-                                            23] not in (None, ""):
+                                        23] not in (None, ""):
                                         if created_product_tmpl and created_product_tmpl.product_variant_id and created_product_tmpl.type == 'product':
                                             stock_vals = {
                                                 'product_tmpl_id':
-                                                created_product_tmpl.id,
+                                                    created_product_tmpl.id,
                                                 'new_quantity':
-                                                row[23],
+                                                    row[23],
                                                 'product_id':
-                                                created_product_tmpl.
-                                                product_variant_id.id
+                                                    created_product_tmpl.
+                                                        product_variant_id.id
                                             }
                                             created_qty_on_hand = self.env[
                                                 'stock.change.product.qty'].create(
-                                                    stock_vals)
+                                                stock_vals)
                                             if created_qty_on_hand:
                                                 created_qty_on_hand.change_product_qty(
                                                 )
@@ -993,7 +993,7 @@ class ImportProductVarWizard(models.TransientModel):
                                     pro_attr_obj = self.env[
                                         'product.attribute']
                                     if row[17].strip() not in (
-                                            None, ""
+                                        None, ""
                                     ) and row[18].strip() not in (None, ""):
                                         attr_ids_list = []
                                         for attr in row[17].split(','):
@@ -1015,31 +1015,31 @@ class ImportProductVarWizard(models.TransientModel):
                                             attr_value = attr_value.strip()
                                             splited_attr_value_price_list = []
 
-                                            #Product Attribute Price Start Here
+                                            # Product Attribute Price Start Here
                                             # attribute_value@attribute_price
                                             if '@' in attr_value:
                                                 splited_attr_value_price_list = attr_value.split(
                                                     '@')
                                                 attr_value_price_dic.update({
                                                     splited_attr_value_price_list[0]:
-                                                    splited_attr_value_price_list[
-                                                        1]
+                                                        splited_attr_value_price_list[
+                                                            1]
                                                 })
                                             else:
                                                 splited_attr_value_price_list = [
                                                     attr_value
                                                 ]
-                                                #Product Attribute Price Ends Here
+                                                # Product Attribute Price Ends Here
 
                                             if splited_attr_value_price_list[
-                                                    0] != '':
+                                                0] != '':
                                                 attr_value_list.append(
                                                     splited_attr_value_price_list[
                                                         0])
 
                                         attr_value_ids_list = []
                                         if len(attr_ids_list) == len(
-                                                attr_value_list):
+                                            attr_value_list):
                                             i = 0
                                             while i < len(attr_ids_list):
                                                 search_attr_value = False
@@ -1054,9 +1054,9 @@ class ImportProductVarWizard(models.TransientModel):
                                                     search_attr_value = pro_attr_value_obj.create(
                                                         {
                                                             'name':
-                                                            attr_value_list[i],
+                                                                attr_value_list[i],
                                                             'attribute_id':
-                                                            attr_ids_list[i]
+                                                                attr_ids_list[i]
                                                         })
 
                                                 attr_value_ids_list.append(
@@ -1113,22 +1113,22 @@ class ImportProductVarWizard(models.TransientModel):
                                                                 i])
                                                         search_attr_line.write({
                                                             'value_ids':
-                                                            [(6, 0,
-                                                              past_values_list)
-                                                             ]
+                                                                [(6, 0,
+                                                                  past_values_list)
+                                                                 ]
                                                         })
                                                     else:
                                                         pro_attr_line_obj.create({
                                                             'attribute_id':
-                                                            attr_ids_list[i],
+                                                                attr_ids_list[i],
                                                             'value_ids':
-                                                            [(6, 0, [
-                                                                attr_value_ids_list[
-                                                                    i]
-                                                            ])],
+                                                                [(6, 0, [
+                                                                    attr_value_ids_list[
+                                                                        i]
+                                                                ])],
                                                             'product_tmpl_id':
-                                                            created_product_tmpl
-                                                            .id,
+                                                                created_product_tmpl
+                                                                    .id,
                                                         })
                                                     i += 1
 
@@ -1159,28 +1159,28 @@ class ImportProductVarWizard(models.TransientModel):
                                                     counter = counter + 1
                                                     continue
 
-                                                #update price extra start here
+                                                # update price extra start here
                                                 if attr_value_price_dic:
                                                     product_tmpl_attribute_value_obj = self.env[
                                                         "product.template.attribute.value"]
                                                     extra_price = 0
                                                     for product_varient_attribute_value_id in product_varient.product_template_attribute_value_ids:
                                                         if attr_value_price_dic.get(
-                                                                product_varient_attribute_value_id
+                                                            product_varient_attribute_value_id
                                                                 .name, False):
                                                             extra_price = 0
                                                             if attr_value_price_dic.get(
-                                                                    product_varient_attribute_value_id
+                                                                product_varient_attribute_value_id
                                                                     .name
                                                             ) not in [
-                                                                    0, 0.0, '',
-                                                                    "", None
+                                                                0, 0.0, '',
+                                                                "", None
                                                             ]:
                                                                 extra_price = float(
                                                                     attr_value_price_dic
-                                                                    .get(
+                                                                        .get(
                                                                         product_varient_attribute_value_id
-                                                                        .name))
+                                                                            .name))
 
                                                                 search_attrs = product_tmpl_attribute_value_obj.search(
                                                                     [('product_tmpl_id',
@@ -1204,14 +1204,14 @@ class ImportProductVarWizard(models.TransientModel):
                                                                 if search_attrs:
                                                                     search_attrs.write({
                                                                         'price_extra':
-                                                                        extra_price,
+                                                                            extra_price,
                                                                     })
-                                                #update price extra ends here
+                                                # update price extra ends here
 
                                                 if row[19] not in (None, ""):
                                                     var_vals.update({
                                                         'default_code':
-                                                        row[19]
+                                                            row[19]
                                                     })
 
                                                 if row[20] not in (None, ""):
@@ -1228,7 +1228,7 @@ class ImportProductVarWizard(models.TransientModel):
                                                 if row[26] not in (None, ""):
                                                     var_vals.update({
                                                         'standard_price':
-                                                        row[26]
+                                                            row[26]
                                                     })
 
                                                 # ===========================================================
@@ -1274,25 +1274,25 @@ class ImportProductVarWizard(models.TransientModel):
                                                 # ===========================================================
 
                                                 if product_varient.type == 'product' and row[
-                                                        23] != '':
+                                                    23] != '':
                                                     stock_vals = {
                                                         'product_tmpl_id':
-                                                        created_product_tmpl.
-                                                        id,
+                                                            created_product_tmpl.
+                                                                id,
                                                         'new_quantity':
-                                                        row[23],
+                                                            row[23],
                                                         'product_id':
-                                                        product_varient.id
+                                                            product_varient.id
                                                     }
                                                     created_qty_on_hand = self.env[
                                                         'stock.change.product.qty'].create(
-                                                            stock_vals)
+                                                        stock_vals)
                                                     if created_qty_on_hand:
                                                         created_qty_on_hand.change_product_qty(
                                                         )
 
                                                 if row[24].strip() not in (
-                                                        None, ""):
+                                                    None, ""):
                                                     image_path = row[24].strip(
                                                     )
                                                     if "http://" in image_path or "https://" in image_path:
@@ -1304,7 +1304,7 @@ class ImportProductVarWizard(models.TransientModel):
                                                                     r.content)
                                                                 var_vals.update({
                                                                     'image_1920':
-                                                                    image_base64
+                                                                        image_base64
                                                                 })
                                                             else:
                                                                 skipped_line_no[
@@ -1324,8 +1324,8 @@ class ImportProductVarWizard(models.TransientModel):
                                                     else:
                                                         try:
                                                             with open(
-                                                                    image_path,
-                                                                    'rb'
+                                                                image_path,
+                                                                'rb'
                                                             ) as image:
                                                                 image.seek(0)
                                                                 binary_data = image.read(
@@ -1336,7 +1336,7 @@ class ImportProductVarWizard(models.TransientModel):
                                                                 if image_base64:
                                                                     var_vals.update({
                                                                         'image_1920':
-                                                                        image_base64
+                                                                            image_base64
                                                                     })
                                                                 else:
                                                                     skipped_line_no[
@@ -1363,9 +1363,9 @@ class ImportProductVarWizard(models.TransientModel):
                                                 multi_img_vals_list = []
 
                                                 if row[25].strip() not in (
-                                                        None, ""):
+                                                    None, ""):
                                                     for x in row[25].split(
-                                                            ','):
+                                                        ','):
                                                         x = x.strip()
                                                         image_path = x
                                                         if "http://" in image_path or "https://" in image_path:
@@ -1375,7 +1375,7 @@ class ImportProductVarWizard(models.TransientModel):
                                                                 if r and r.content:
                                                                     image_base64 = base64.encodebytes(
                                                                         r.
-                                                                        content
+                                                                            content
                                                                     )
                                                                     image_base64_list.append(
                                                                         image_base64
@@ -1398,8 +1398,8 @@ class ImportProductVarWizard(models.TransientModel):
                                                         else:
                                                             try:
                                                                 with open(
-                                                                        image_path,
-                                                                        'rb'
+                                                                    image_path,
+                                                                    'rb'
                                                                 ) as image:
                                                                     image.seek(
                                                                         0)
@@ -1432,7 +1432,7 @@ class ImportProductVarWizard(models.TransientModel):
                                                     for item in image_base64_list:
                                                         img_val = {
                                                             "name":
-                                                            img_label_default,
+                                                                img_label_default,
                                                             "image_1920": item,
                                                         }
 
@@ -1441,21 +1441,20 @@ class ImportProductVarWizard(models.TransientModel):
 
                                                     var_vals.update({
                                                         "product_variant_image_ids":
-                                                        multi_img_vals_list
+                                                            multi_img_vals_list
                                                     })
 
+                                                #                                                 product_varient.product_variant_image_ids = False
 
-#                                                 product_varient.product_variant_image_ids = False
-
-# ================================================================
-# Ecommerce Product variant Extra Variant Media
-# ================================================================
+                                                # ================================================================
+                                                # Ecommerce Product variant Extra Variant Media
+                                                # ================================================================
 
                                                 product_varient.write(var_vals)
 
                                         elif self.method == 'write':
                                             # You have to search product by it's attributes and update its fields. do not create new proeduct.
-                                            #Search Variants Here
+                                            # Search Variants Here
 
                                             product_var_obj = self.env[
                                                 'product.product']
@@ -1477,7 +1476,7 @@ class ImportProductVarWizard(models.TransientModel):
                                                 if attr_value_ids_list and attr_ids_list:
                                                     i = 0
                                                     while i < len(
-                                                            attr_ids_list):
+                                                        attr_ids_list):
                                                         search_attr_line = pro_attr_line_obj.search(
                                                             [
                                                                 ('attribute_id',
@@ -1498,23 +1497,23 @@ class ImportProductVarWizard(models.TransientModel):
                                                                     i])
                                                             search_attr_line.write({
                                                                 'value_ids':
-                                                                [(6, 0,
-                                                                  past_values_list
-                                                                  )]
+                                                                    [(6, 0,
+                                                                      past_values_list
+                                                                      )]
                                                             })
                                                         else:
                                                             pro_attr_line_obj.create({
                                                                 'attribute_id':
-                                                                attr_ids_list[
-                                                                    i],
+                                                                    attr_ids_list[
+                                                                        i],
                                                                 'value_ids':
-                                                                [(6, 0, [
-                                                                    attr_value_ids_list[
-                                                                        i]
-                                                                ])],
+                                                                    [(6, 0, [
+                                                                        attr_value_ids_list[
+                                                                            i]
+                                                                    ])],
                                                                 'product_tmpl_id':
-                                                                created_product_tmpl
-                                                                .id,
+                                                                    created_product_tmpl
+                                                                        .id,
                                                             })
                                                         i += 1
                                                 created_product_tmpl._create_variant_ids(
@@ -1529,27 +1528,27 @@ class ImportProductVarWizard(models.TransientModel):
                                                 counter = counter + 1
                                                 continue
 
-                                            #update price extra start here
+                                            # update price extra start here
                                             if attr_value_price_dic:
                                                 product_tmpl_attribute_value_obj = self.env[
                                                     "product.template.attribute.value"]
                                                 extra_price = 0
                                                 for product_varient_attribute_value_id in product_varient.product_template_attribute_value_ids:
                                                     if attr_value_price_dic.get(
-                                                            product_varient_attribute_value_id
+                                                        product_varient_attribute_value_id
                                                             .name, False):
                                                         extra_price = 0
                                                         if attr_value_price_dic.get(
-                                                                product_varient_attribute_value_id
+                                                            product_varient_attribute_value_id
                                                                 .name) not in [
-                                                                    0, 0.0, '',
-                                                                    "", None
-                                                                ]:
+                                                            0, 0.0, '',
+                                                            "", None
+                                                        ]:
                                                             extra_price = float(
                                                                 attr_value_price_dic
-                                                                .get(
+                                                                    .get(
                                                                     product_varient_attribute_value_id
-                                                                    .name))
+                                                                        .name))
 
                                                             search_attrs = product_tmpl_attribute_value_obj.search(
                                                                 [('product_tmpl_id',
@@ -1572,9 +1571,9 @@ class ImportProductVarWizard(models.TransientModel):
                                                             if search_attrs:
                                                                 search_attrs.write({
                                                                     'price_extra':
-                                                                    extra_price,
+                                                                        extra_price,
                                                                 })
-                                            #update price extra ends here
+                                            # update price extra ends here
 
                                             if row[19] not in (None, ""):
                                                 var_vals.update(
@@ -1594,7 +1593,7 @@ class ImportProductVarWizard(models.TransientModel):
                                             if row[26] not in (None, ""):
                                                 var_vals.update({
                                                     'standard_price':
-                                                    row[26]
+                                                        row[26]
                                                 })
 
                                             # ===========================================================
@@ -1623,7 +1622,7 @@ class ImportProductVarWizard(models.TransientModel):
                                                 if dic.get("error", False):
                                                     skipped_line_no[str(
                                                         counter)] = dic.get(
-                                                            "error")
+                                                        "error")
                                                     is_any_error_in_dynamic_field = True
                                                     break
                                                 else:
@@ -1638,18 +1637,18 @@ class ImportProductVarWizard(models.TransientModel):
                                             # ===========================================================
 
                                             if product_varient.type == 'product' and row[
-                                                    23] != '':
+                                                23] != '':
                                                 stock_vals = {
                                                     'product_tmpl_id':
-                                                    created_product_tmpl.id,
+                                                        created_product_tmpl.id,
                                                     'new_quantity':
-                                                    row[23],
+                                                        row[23],
                                                     'product_id':
-                                                    product_varient.id
+                                                        product_varient.id
                                                 }
                                                 created_qty_on_hand = self.env[
                                                     'stock.change.product.qty'].create(
-                                                        stock_vals)
+                                                    stock_vals)
                                                 if created_qty_on_hand:
                                                     created_qty_on_hand.change_product_qty(
                                                     )
@@ -1666,7 +1665,7 @@ class ImportProductVarWizard(models.TransientModel):
                                                                 r.content)
                                                             var_vals.update({
                                                                 'image_1920':
-                                                                image_base64
+                                                                    image_base64
                                                             })
                                                         else:
                                                             skipped_line_no[str(
@@ -1685,8 +1684,8 @@ class ImportProductVarWizard(models.TransientModel):
                                                 else:
                                                     try:
                                                         with open(
-                                                                image_path,
-                                                                'rb') as image:
+                                                            image_path,
+                                                            'rb') as image:
                                                             image.seek(0)
                                                             binary_data = image.read(
                                                             )
@@ -1696,7 +1695,7 @@ class ImportProductVarWizard(models.TransientModel):
                                                             if image_base64:
                                                                 var_vals.update({
                                                                     'image_1920':
-                                                                    image_base64
+                                                                        image_base64
                                                                 })
                                                             else:
                                                                 skipped_line_no[
@@ -1755,8 +1754,8 @@ class ImportProductVarWizard(models.TransientModel):
                                                     else:
                                                         try:
                                                             with open(
-                                                                    image_path,
-                                                                    'rb'
+                                                                image_path,
+                                                                'rb'
                                                             ) as image:
                                                                 image.seek(0)
                                                                 binary_data = image.read(
@@ -1787,7 +1786,7 @@ class ImportProductVarWizard(models.TransientModel):
                                                 for item in image_base64_list:
                                                     img_val = {
                                                         "name":
-                                                        img_label_default,
+                                                            img_label_default,
                                                         "image_1920": item,
                                                     }
 
@@ -1796,7 +1795,7 @@ class ImportProductVarWizard(models.TransientModel):
 
                                                 var_vals.update({
                                                     "product_variant_image_ids":
-                                                    multi_img_vals_list
+                                                        multi_img_vals_list
                                                 })
 
                                             product_varient.product_variant_image_ids = False
@@ -1819,15 +1818,15 @@ class ImportProductVarWizard(models.TransientModel):
                             counter = counter + 1
                             continue
 
-                    #For Loop Ends here
-                    #TODO: NEED TO CLEAN LAST PRODUCT ALSO.
+                    # For Loop Ends here
+                    # TODO: NEED TO CLEAN LAST PRODUCT ALSO.
                     if created_product_tmpl and self.method == 'write':
 
                         # Remove Unnecessary Attribute Line.
                         # ===============================================
                         attrs = created_product_tmpl.attribute_line_ids.mapped(
                             'attribute_id').filtered(
-                                lambda r: r.id not in list_to_keep_attr)
+                            lambda r: r.id not in list_to_keep_attr)
                         for attr in attrs:
                             line = created_product_tmpl.attribute_line_ids.search(
                                 [
@@ -1846,7 +1845,7 @@ class ImportProductVarWizard(models.TransientModel):
                         # ===============================================
                         attr_values = created_product_tmpl.attribute_line_ids.mapped(
                             'value_ids').filtered(
-                                lambda r: r.id not in list_to_keep_attr_value)
+                            lambda r: r.id not in list_to_keep_attr_value)
                         for attr_value in attr_values:
                             line = created_product_tmpl.attribute_line_ids.search(
                                 [
